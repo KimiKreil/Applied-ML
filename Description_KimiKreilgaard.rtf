@@ -1,0 +1,59 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf600
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww20960\viewh13760\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 1. Classification_KimiKreilgaard_XGBoostClassifier.txt:\
+\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+Algorithm: XGBoostClassifier\
+Pre-processing: Scaled the input features using SKLearn\'92s RobustScaler (I only realised later this is only necessary for neural networks, but I\'92m thinking it can\'92t hurt)\
+Physical parameters: Optimized with SHAP tree-explainer. Best 15 were chosen, since more parameters only increased the AUC score slightly, but cost significantly more computer time.\
+Key HP values: max_depth=9, n_estimators=326\
+HP optimisation: RandomSearch optimised on the metric \'93balanced_accuracy\'94 performed better in the validation set (higher AUC score and lower LOSS) than the model found with Bayesian Optimization maximising the metric (negative) cross entropy. HP parameters form Random Search were chosen.\
+Loss function and value on validation set: 1.4085 (Binary Cross Entropy with 5 fold cross validation)\
+AUC score: 0.9752\
+Own evaluation: Well performing model. With an unbalanced data set it turned out to be good to optimise parameters according to the balanced accuracy which is usually good for unbalanced data sets.\
+\
+2. Regression_KimiKreilgaard_XGBoostRegressor.txt:\
+\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+Algorithm: XGBoostRegressor\
+Pre-Processing: Scaled the input features using SKLearn\'92s RobustScaler (I only realised later this is only necessary for neural networks, but I\'92m thinking it can\'92t hurt)\
+Physical parameters: Optimized with SHAP. Best 12 were chosen, since more parameters only decreased the MAE loss score slightly, but cost significantly more computer time. I also had to go above 6 parameters since there seemed to be a jump up in the MAE score when including 4-6 parameters. Not quite sure why this is the case.\
+Key HP values: max_depth=3, n_estimators=277\
+HP optimisation: found with random search with 10 iterations and 5 fold cross validation.\
+Loss function and value on validation set: 0.065 (MAE of relative deviation = (P-T)/T, 20% for validation). \
+Own evaluation: Good model but some energies are quite overestimates, while not nearly as many are underestimated. This only happens for a few values though, when computing the MAE for percentiles I find that within 1 standard deviation (68%)of 0 relative error the mean absolute error on the relative error is 0.02, and for 2 std (95%) it is 0.03. So the model performs quite well for most particles but there are outliers that could be improved.\
+\
+NOTE: this had one error in the solution reader since this asked for a max of 10 variables while the description said 15. I have used 12.
+\f1\fs26 \expnd0\expndtw0\kerning0
+\
+\
+3. Classification_KimiKreilgaard_MLPClassifier.txt:\
+
+\f0\fs24 \kerning1\expnd0\expndtw0 \'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+Algorithm: MLPClassifier (SKLearn)\
+Pre-Processing: RobustScaler from SKLearn\
+Physical parameters: Optimized with SHAP kernel-explainer. Best 12 were chosen, since more parameters only increased the AUC score slightly, but cost significantly more computer timer.\
+Key HP values: max_iter = 1000, hidden_layer_sizes=(100,100)\
+HP optimisation: GridSearch optimised on the metric \'93balanced_accuracy\'94.\
+Loss function and value on validation set: 1.9441 (Binary Cross Entropy with 5 fold cross validation)\
+AUC score: 0.9462\
+Own evaluation: Okay model, but performed worse than the XGBoost model. Optimisation of hyper parameters took a long time due to hidden_layer_size having two components. If I had more time (or more patience) this could probably have been optimised a little better.
+\f1\fs26 \expnd0\expndtw0\kerning0
+\
+\
+4. Clustering_KimiKreilgaard_t-SNE_and_SpectralClustering.txt:
+\f0\fs24 \kerning1\expnd0\expndtw0 \
+\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+Algorithm: t-SNE to embed in lower space and visualise the clustering and SpectralClustering to find labels based on the embedding. Both from SKLearn. The SpectralClustering however kept destroying my kernel and needs much more memory for such a large data set so as a last solution in the middle of the night I chose KMeans.\
+Physical parameters: chose 5 best according to an F-test in the SelectKBest function from SKLearn. Also tried defining a separation in each variable based on the mean and std of each population, and furthermore tried to use the best 5 parameters found in XGB classification model. Initially chose 10 parameters, but didn\'92t seem to improve from 5, and only made the code more expensive to run.\
+Key HP values: k=19 clusters\
+HP optimisation: computed the silhouette score and chose k with a score closest to 1. Score was a little above 0.23 from my estimation of the plot I can still see. My computer keeps crashing right now so this is the best I can say. Notice this was computed for the SpectralClustering which turned out not to work for a larger data set so it is not as saying for the actual predictions.\
+Pre-Processing: Used the RobustScaler from SKLearn.\
+Score = mean( percentage of dominant population in each cluster ): 0.87. The median was however 0.90 which indicated that the model is quite good according to my evaluation, but again this evaluation is performed on a subsample the train set, and I was not able to use this algorithm even though it looked really good. I have not computed any scores for the KMeans, this was just a last minute solution to make some predictions. But it is clear that it is not performing as good.\
+Own evaluation: \
+- Spectral: The SpectralClustering indicated a quite decent model but could definitely perform better with more time. The code for this problem took forever to run, so I had multiple ideas that I did not have the patience to implement since it would take 3+ hours to test each of the things. One could try embedding them in 3D as well, and do some hyperparameter optimisation on K instead of basing it only on the silhouette score where we don\'92t need labels. So I could have exploited that we have the labels for the train set, and optimised k to maximise the either the overall accuracy or perhaps a metric combining the accuracy in each cluster. The model has potential but doesn\'92t seem to be entirely developed yet.\
+- The KMeans clustering I ended up I don\'92t really have any scores for but it looks like a bad model. The KMeans only cares about euclidean distances and with the t-SNE method I implemented, how concentrated the clusters were was actually much more important and this feature was lost in the last minute swap of model. I am very dissapointed with the final model, but the method I have described and the results the SpectralClustering indicated I believe was pretty good. Unfortunately my computer could not implement it since I would need more memory it seems.\
+}

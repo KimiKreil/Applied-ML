@@ -1,0 +1,15 @@
+p_sigmad0
+p_ethad
+p_Rphi
+p_Reta
+p_Rhad
+p_deltaEta1
+p_ptconecoreTrackPtrCorrection
+p_deltaPhiRescaled2
+p_d0
+p_ambiguityType
+p_Rhad1
+p_nTracks
+p_d0Sig
+p_E7x11_Lr3
+p_dPOverP
